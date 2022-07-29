@@ -1,7 +1,10 @@
 // Coloque aqui suas actions
-const userEmail = (email) => ({
+export const userEmail = (email) => ({
   type: 'EMAIL',
   email,
 });
 
-export default userEmail;
+export const requestCurrencies = (currencies) => ({
+  type: 'CURRENCIES',
+  currencies,
+});
