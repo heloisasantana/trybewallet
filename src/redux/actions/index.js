@@ -8,3 +8,13 @@ export const requestCurrencies = (currencies) => ({
   type: 'CURRENCIES',
   currencies,
 });
+
+export const submitExpenses = (expenses) => ({
+  type: 'EXPENSES',
+  expenses,
+});
+
+export const requestAsk = (ask) => ({
+  type: 'ASK',
+  ask,
+});
