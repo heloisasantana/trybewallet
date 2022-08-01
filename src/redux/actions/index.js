@@ -9,12 +9,7 @@ export const requestCurrencies = (currencies) => ({
   currencies,
 });
 
-export const submitExpenses = (expenses) => ({
+export const saveExpenses = (expenses) => ({
   type: 'EXPENSES',
   expenses,
-});
-
-export const requestAsk = (ask) => ({
-  type: 'ASK',
-  ask,
 });

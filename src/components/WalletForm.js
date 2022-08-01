@@ -1,19 +1,18 @@
 import React from 'react';
 import { connect } from 'react-redux';
-// import PropTypes from 'prop-types';
-import { requestCurrencies, submitExpenses, requestAsk } from '../redux/actions';
+import PropTypes from 'prop-types';
+import { requestCurrencies, saveExpenses } from '../redux/actions';
 
 class WalletForm extends React.Component {
   constructor() {
     super();
     this.state = {
       currencies: [],
-      valor: '',
-      descricao: '',
-      moeda: 'USD',
-      pagamento: 'Dinheiro',
-      categoria: 'Alimentação',
-      expensesTemporary: [],
+      value: '',
+      description: '',
+      currency: 'USD',
+      method: 'Dinheiro',
+      tag: 'Alimentação',
     };
   }
 
@@ -40,41 +39,30 @@ class WalletForm extends React.Component {
   }
 
   saveInfos = () => {
-    const { valor, descricao, moeda, pagamento, categoria, expensesTemporary } = this.state;
-    const { dispatchAsk, dispatchExpenses } = this.props;
-    this.setState((prev) => ({
-      expensesTemporary: [...prev.expensesTemporary, { valor, descricao, moeda, pagamento, categoria }],
-    }));
-    const gerandoExpenses = async () => {
+    const { value, description, currency, method, tag } = this.state;
+    const { dispatchExpenses, expenses } = this.props;
+    const generateExpenses = async () => {
       const resolvedAPI = await fetch('https://economia.awesomeapi.com.br/json/all');
       await resolvedAPI.json()
         .then((response) => {
-          const expenses = {
-            id: expensesTemporary.length,
-            value: valor,
-            description: descricao,
-            currency: moeda,
-            method: pagamento,
-            tag: categoria,
+          const expensesToSave = {
+            id: expenses.length,
+            value,
+            description,
+            currency,
+            method,
+            tag,
             exchangeRates: response,
           };
-          dispatchExpenses(expenses);
-          const especificCoin = async () => {
-            const fetchCoin = await fetch(`https://economia.awesomeapi.com.br/json/${expenses.currency}`);
-            await fetchCoin.json()
-              .then((data) => {
-                dispatchAsk(data[0].ask);
-              });
-          };
-          especificCoin();
+          dispatchExpenses(expensesToSave);
         });
     };
-    gerandoExpenses();
-    this.setState({ valor: '', descricao: '' });
+    generateExpenses();
+    this.setState({ value: '', description: '' });
   }
 
   render() {
-    const { currencies, valor, descricao, moeda, pagamento, categoria } = this.state;
+    const { currencies, value, description, currency, method, tag } = this.state;
     return (
       <div>
         <p>Despesa</p>
@@ -83,8 +71,8 @@ class WalletForm extends React.Component {
           type="text"
           placeholder="Digite aqui"
           data-testid="value-input"
-          name="valor"
-          value={ valor }
+          name="value"
+          value={ value }
           onChange={ this.handleChange }
         />
         <span> Descrição </span>
@@ -92,29 +80,29 @@ class WalletForm extends React.Component {
           type="text"
           placeholder="Digite aqui"
           data-testid="description-input"
-          name="descricao"
-          value={ descricao }
+          name="description"
+          value={ description }
           onChange={ this.handleChange }
         />
-        <label htmlFor="moeda">
+        <label htmlFor="currency">
           <span> Moeda </span>
           <select
-            id="moeda"
+            id="currency"
             data-testid="currency-input"
-            value={ moeda }
-            name="moeda"
+            name="currency"
+            value={ currency }
             onChange={ this.handleChange }
           >
             { currencies.map((item) => <option key={ item }>{ item }</option>) }
           </select>
         </label>
-        <label htmlFor="pagamento">
+        <label htmlFor="method">
           <span> Forma de Pagamento </span>
           <select
-            id="pagamento"
+            id="method"
             data-testid="method-input"
-            name="pagamento"
-            value={ pagamento }
+            name="method"
+            value={ method }
             onChange={ this.handleChange }
           >
             <option>Dinheiro</option>
@@ -122,13 +110,13 @@ class WalletForm extends React.Component {
             <option>Cartão de débito</option>
           </select>
         </label>
-        <label htmlFor="categoria">
+        <label htmlFor="tag">
           <span> Categoria </span>
           <select
-            id="categoria"
+            id="tag"
             data-testid="tag-input"
-            name="categoria"
-            value={ categoria }
+            name="tag"
+            value={ tag }
             onChange={ this.handleChange }
           >
             <option>Alimentação</option>
@@ -144,20 +132,24 @@ class WalletForm extends React.Component {
   }
 }
 
-function mapDispatchToProps(dispatch) {
+function mapStateToProps(state) {
   return {
-    dispatchCurrencies: (currencies) => dispatch(requestCurrencies(currencies)),
-    dispatchExpenses: (expenses) => dispatch(submitExpenses(expenses)),
-    dispatchAsk: (ask) => dispatch(requestAsk(ask)),
+    expenses: state.wallet.expenses,
   };
 }
 
-// WalletForm.propTypes = {
-//   dispatchCurrencies: PropTypes.shape({
-//     currencies: PropTypes.arrayOf(PropTypes.string).isRequired,
-//   }).isRequired,
-//   dispatchExpenses:
-//   dispatchAsk:
-// };
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchCurrencies: (currencies) => dispatch(requestCurrencies(currencies)),
+    dispatchExpenses: (expenses) => dispatch(saveExpenses(expenses)),
+  };
+}
 
-export default connect(null, mapDispatchToProps)(WalletForm);
+WalletForm.propTypes = {
+  // Referência para utilizar o any para receber um objeto com qualquer tipo de dado: https://www.codegrepper.com/code-examples/whatever/proptypes.any;
+  expenses: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
+  dispatchCurrencies: PropTypes.func.isRequired,
+  dispatchExpenses: PropTypes.func.isRequired,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(WalletForm);
