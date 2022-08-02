@@ -1,9 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { removeFromExpenses } from '../redux/actions';
+import { sendExpenseToEdit, removeFromExpenses } from '../redux/actions';
 
 class Table extends React.Component {
+  editExpense = (expenseID) => {
+    const { dispatchToEdit } = this.props;
+    dispatchToEdit(expenseID);
+  }
+
   removeExpense = (expenseID) => {
     const { dispatchRemoveFromExpenses } = this.props;
     dispatchRemoveFromExpenses(expenseID);
@@ -42,6 +47,13 @@ class Table extends React.Component {
                 <td>
                   <button
                     type="button"
+                    data-testid="edit-btn"
+                    onClick={ () => this.editExpense(e.id) }
+                  >
+                    Editar
+                  </button>
+                  <button
+                    type="button"
                     data-testid="delete-btn"
                     onClick={ () => this.removeExpense(e.id) }
                   >
@@ -65,6 +77,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
+    dispatchToEdit: (expenseID) => dispatch(sendExpenseToEdit(expenseID)),
     dispatchRemoveFromExpenses: (expenseID) => dispatch(removeFromExpenses(expenseID)),
   };
 }
@@ -72,6 +85,7 @@ function mapDispatchToProps(dispatch) {
 Table.propTypes = {
   // Referência para utilizar o any para receber um objeto com qualquer tipo de dado: https://www.codegrepper.com/code-examples/whatever/proptypes.any;
   expenses: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
+  dispatchToEdit: PropTypes.func.isRequired,
   dispatchRemoveFromExpenses: PropTypes.func.isRequired,
 };
 

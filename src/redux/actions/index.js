@@ -18,3 +18,13 @@ export const removeFromExpenses = (expenseID) => ({
   type: 'REMOVING',
   expenseID,
 });
+
+export const sendExpenseToEdit = (expenseID) => ({
+  type: 'EDITING',
+  expenseID,
+});
+
+export const refreshExpenses = (editedExpense) => ({
+  type: 'REFRESH',
+  editedExpense,
+});
