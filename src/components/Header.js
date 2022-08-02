@@ -5,16 +5,19 @@ import { connect } from 'react-redux';
 class Header extends React.Component {
   render() {
     const { email, expenses } = this.props;
+
     return (
       <div>
         <p data-testid="email-field">{ email === '' ? 'Usuário não logado' : email }</p>
         <span data-testid="total-field">
-          { expenses.length === 0 ? ('0') : (
-            expenses
-              .reduce((acc, curr) => acc
-            + (Number(curr.value) * curr.exchangeRates[curr.currency].ask), 0)
-              .toFixed(2)
-          )}
+          {
+            expenses.length === 0 ? ('0.00') : (
+              expenses
+                .reduce((acc, curr) => acc
+              + (Number(curr.value) * curr.exchangeRates[curr.currency].ask), 0)
+                .toFixed(2)
+            )
+          }
         </span>
         <span data-testid="header-currency-field"> BRL</span>
       </div>

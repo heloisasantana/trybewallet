@@ -1,8 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { removeFromExpenses } from '../redux/actions';
 
 class Table extends React.Component {
+  removeExpense = (expenseID) => {
+    const { dispatchRemoveFromExpenses } = this.props;
+    dispatchRemoveFromExpenses(expenseID);
+  }
+
   render() {
     const { expenses } = this.props;
     return (
@@ -33,6 +39,15 @@ class Table extends React.Component {
                     .toFixed(2) }
                 </td>
                 <td>Real</td>
+                <td>
+                  <button
+                    type="button"
+                    data-testid="delete-btn"
+                    onClick={ () => this.removeExpense(e.id) }
+                  >
+                    Excluir
+                  </button>
+                </td>
               </tr>
             </tbody>
           ))}
@@ -48,9 +63,16 @@ function mapStateToProps(state) {
   };
 }
 
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchRemoveFromExpenses: (expenseID) => dispatch(removeFromExpenses(expenseID)),
+  };
+}
+
 Table.propTypes = {
   // Referência para utilizar o any para receber um objeto com qualquer tipo de dado: https://www.codegrepper.com/code-examples/whatever/proptypes.any;
   expenses: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
+  dispatchRemoveFromExpenses: PropTypes.func.isRequired,
 };
 
-export default connect(mapStateToProps, null)(Table);
+export default connect(mapStateToProps, mapDispatchToProps)(Table);

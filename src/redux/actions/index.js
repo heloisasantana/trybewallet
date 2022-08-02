@@ -13,3 +13,8 @@ export const saveExpenses = (expenses) => ({
   type: 'EXPENSES',
   expenses,
 });
+
+export const removeFromExpenses = (expenseID) => ({
+  type: 'REMOVING',
+  expenseID,
+});
